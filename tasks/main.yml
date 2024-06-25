@@ -1,4 +1,9 @@
 ---
-- name: "Mock task"
-  ansible.builtin.debug:
-    msg: "hello, world!"
+# tasks file for playbooks/roles/miniforge
+
+- name: "Deploy Mamba in a user loop"
+  tags: [ miniforge ]
+  loop: "{{ usernames }}"
+  loop_control:
+    loop_var: loop_username
+  ansible.builtin.include_tasks: "miniforge.yaml"

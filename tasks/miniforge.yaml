@@ -1,0 +1,74 @@
+---
+# tasks file for playbooks/roles/miniforge
+
+- name: "Build miniforge basic facts ({{ loop_username }})"
+  tags: [ miniforge ]
+  ansible.builtin.set_fact:
+    miniforge_dir: "/home/{{ loop_username }}/miniforge"
+    miniforge_version: "miniforge-{{ ansible_system }}-{{ ansible_architecture }}"
+
+
+- name: "Build miniforge path facts ({{ loop_username }})"
+  tags: [ miniforge ]
+  ansible.builtin.set_fact:
+    miniforge_script_path: "/home/{{ loop_username }}/{{ miniforge_version }}.sh"
+    mamba_bin_path: "{{ miniforge_dir }}/bin/mamba"
+
+
+- name: "Display miniforge script version ({{ loop_username }})"
+  tags: [ miniforge ]
+  ansible.builtin.debug:
+    msg: "{{ miniforge_script_path }}"
+
+
+- name: "Install Mamba"
+  tags: [ miniforge ]
+  become: true
+  become_user: "{{ loop_username }}"
+  block:
+    - name: "Check Mamba availability ({{ loop_username }})"
+      changed_when: false
+      ansible.builtin.command:
+        cmd: "{{ mamba_bin_path }} info"
+
+  rescue:
+    - name: "Download miniforge ({{ loop_username }})"
+      ansible.builtin.get_url:
+        url: "https://github.com/conda-forge/miniforge/releases/latest/download/{{ miniforge_version }}.sh"
+        dest: "{{ miniforge_script_path }}"
+        mode: "0600"
+
+    - name: "Install miniforge in a non-interactive mode ({{ loop_username }})"
+      ansible.builtin.command:
+        cmd: "/bin/bash {{ miniforge_script_path }} -b"
+        creates: "/home/{{ loop_username }}/miniforge"
+
+    - name: "Initialize Mamba/Conda ({{ loop_username }})"
+      changed_when: false
+      ansible.builtin.command:
+        cmd: "{{ mamba_bin_path }} init"
+
+    - name: "Check if Mamba has become available ({{ loop_username }})"
+      changed_when: false
+      ansible.builtin.command:
+        cmd: "{{ mamba_bin_path }} info"
+
+
+- name: "Deploy default .condarc if it doesn't exist already ({{ loop_username }})"
+  tags: [ miniforge ]
+  become: true
+  become_user: "{{ loop_username }}"
+  block:
+    - name: "Check if .condarc already exists ({{ loop_username }})"
+
+      register: this
+      failed_when: this.stat.exists is false
+      ansible.builtin.stat:
+        path: "/home/{{ loop_username }}/.condarc"
+
+  rescue:
+    - name: "Set default channels via .condarc ({{ loop_username }})"
+      ansible.builtin.copy:
+        dest: "/home/{{ loop_username }}/.condarc"
+        content: "{{ condarc | to_nice_yaml }}"
+        mode: "0600"
