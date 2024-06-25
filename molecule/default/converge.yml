@@ -3,3 +3,8 @@
   hosts: all
   roles:
     - role: genlab.miniforge
+      usernames: 
+        - alice
+        - bob
+      condarc:
+        channels: [conda-forge]
