@@ -21,12 +21,11 @@
     msg: "{{ miniforge_script_path }}"
 
 - name: Install additional packages
-  apt:
+  ansible.builtin.apt:
     name:
-      - sudo
+      - sudo 
       - acl
-    update_cache: yes
-    state: present
+    update_cache: true
 
 - name: "Install Mamba"
   tags: [ miniforge ]
