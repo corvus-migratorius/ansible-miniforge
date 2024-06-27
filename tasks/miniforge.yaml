@@ -20,6 +20,13 @@
   ansible.builtin.debug:
     msg: "{{ miniforge_script_path }}"
 
+- name: Install additional packages
+  apt:
+    name:
+      - sudo
+      - acl
+    update_cache: yes
+    state: present
 
 - name: "Install Mamba"
   tags: [ miniforge ]
