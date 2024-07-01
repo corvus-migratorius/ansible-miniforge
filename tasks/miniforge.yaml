@@ -22,7 +22,7 @@
   ansible.builtin.user:
     name: "{{ loop_username }}"
     state: present
-    create_home: yes
+    create_home: true 
 
 
 - name: "Install miniforge"
