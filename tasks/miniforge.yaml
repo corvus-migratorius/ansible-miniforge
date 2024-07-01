@@ -22,7 +22,7 @@
   ansible.builtin.user:
     name: "{{ loop_username }}"
     state: present
-    create_home: true 
+    create_home: true
 
 
 - name: "Install miniforge"
@@ -34,7 +34,7 @@
     - name: "Check Mamba availability ({{ loop_username }})"
       changed_when: false
       ansible.builtin.command:
-        cmd: "{{ mamba_bin_path }} info"      
+        cmd: "{{ mamba_bin_path }} info"     
 
   rescue:
     - name: "Download miniforge ({{ loop_username }})"
@@ -85,4 +85,3 @@
         content: "{{ condarc | to_nice_yaml }}"
         mode: "0600"
       when: condarc_file is not defined or condarc_file == ""
-
