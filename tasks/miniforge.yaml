@@ -17,11 +17,13 @@
   ansible.builtin.debug:
     msg: "{{ miniforge_script_path }}"
 
+
 - name: "Ensure {{ loop_username }} exists"
   ansible.builtin.user:
-    name: "{{ loop_username}}"
+    name: "{{ loop_username }}"
     state: present
     create_home: yes
+
 
 - name: "Install miniforge"
   become: true
