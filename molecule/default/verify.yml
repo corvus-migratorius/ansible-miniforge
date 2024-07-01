@@ -3,3 +3,6 @@
   hosts: all
   roles:
     - role: genlab.miniforge
+      usernames: 
+        - alice
+        - bob
