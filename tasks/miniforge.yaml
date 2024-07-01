@@ -2,52 +2,51 @@
 # tasks file for playbooks/roles/miniforge
 
 - name: "Build miniforge basic facts ({{ loop_username }})"
-  tags: [ miniforge ]
   ansible.builtin.set_fact:
-    miniforge_dir: "/home/{{ loop_username }}/miniforge"
-    miniforge_version: "miniforge-{{ ansible_system }}-{{ ansible_architecture }}"
+    miniforge_dir: "/home/{{ loop_username }}/miniforge3"
+    miniforge_version: "Miniforge3-{{ ansible_system }}-{{ ansible_architecture }}"
 
 
 - name: "Build miniforge path facts ({{ loop_username }})"
-  tags: [ miniforge ]
   ansible.builtin.set_fact:
     miniforge_script_path: "/home/{{ loop_username }}/{{ miniforge_version }}.sh"
     mamba_bin_path: "{{ miniforge_dir }}/bin/mamba"
 
 
 - name: "Display miniforge script version ({{ loop_username }})"
-  tags: [ miniforge ]
   ansible.builtin.debug:
     msg: "{{ miniforge_script_path }}"
 
-- name: Install additional packages
-  ansible.builtin.apt:
-    name:
-      - sudo 
-      - acl
-    update_cache: true
+- name: "Ensure {{ loop_username }} exists"
+  ansible.builtin.user:
+    name: "{{ loop_username}}"
+    state: present
+    create_home: yes
 
-- name: "Install Mamba"
-  tags: [ miniforge ]
+- name: "Install miniforge"
   become: true
+  vars:
+    allow_world_readable_tmpfiles: true
   become_user: "{{ loop_username }}"
   block:
     - name: "Check Mamba availability ({{ loop_username }})"
       changed_when: false
       ansible.builtin.command:
-        cmd: "{{ mamba_bin_path }} info"
+        cmd: "{{ mamba_bin_path }} info"      
 
   rescue:
     - name: "Download miniforge ({{ loop_username }})"
+      vars:
+        allow_world_readable_tmpfiles: true
       ansible.builtin.get_url:
-        url: "https://github.com/conda-forge/miniforge/releases/latest/download/{{ miniforge_version }}.sh"
+        url: "https://github.com/conda-forge/miniforge/releases/download/24.3.0-0/{{ miniforge_version }}.sh"
         dest: "{{ miniforge_script_path }}"
         mode: "0600"
 
     - name: "Install miniforge in a non-interactive mode ({{ loop_username }})"
       ansible.builtin.command:
         cmd: "/bin/bash {{ miniforge_script_path }} -b"
-        creates: "/home/{{ loop_username }}/miniforge"
+        creates: "/home/{{ loop_username }}/miniforge3"
 
     - name: "Initialize Mamba/Conda ({{ loop_username }})"
       changed_when: false
@@ -61,12 +60,10 @@
 
 
 - name: "Deploy default .condarc if it doesn't exist already ({{ loop_username }})"
-  tags: [ miniforge ]
   become: true
   become_user: "{{ loop_username }}"
   block:
     - name: "Check if .condarc already exists ({{ loop_username }})"
-
       register: this
       failed_when: this.stat.exists is false
       ansible.builtin.stat:
