@@ -8,3 +8,4 @@
         - bob
       condarc:
         channels: [conda-forge]
+        dependencies: [ python=3.10 pip>=22.2 shellcheck==0.9.0 terraform==1.6.5]

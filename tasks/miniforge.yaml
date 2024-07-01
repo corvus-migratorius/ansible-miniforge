@@ -72,8 +72,17 @@
         path: "/home/{{ loop_username }}/.condarc"
 
   rescue:
-    - name: "Set default channels via .condarc ({{ loop_username }})"
+    - name: "Set default .condarc from external file if provided ({{ loop_username }})"
+      ansible.builtin.copy:
+        dest: "/home/{{ loop_username }}/.condarc"
+        src: "{{ condarc_file }}"
+        mode: "0600"
+      when: condarc_file is defined and condarc_file != ""
+
+    - name: "Set default content via .condarc ({{ loop_username }})"
       ansible.builtin.copy:
         dest: "/home/{{ loop_username }}/.condarc"
         content: "{{ condarc | to_nice_yaml }}"
         mode: "0600"
+      when: condarc_file is not defined or condarc_file == ""
+
