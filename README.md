@@ -35,10 +35,10 @@ role:
 ----------------
 
 ```yaml
-condarc_file: /tmp/environment.yaml
+condarc_file: environment.yaml
 ```
 
-As an alternative to the list of channels and dependencies, an environment file or lock file can be provided.
+As an alternative to the list of channels and dependencies, an environment file can be provided.
 
 ----------------
 
