@@ -3,6 +3,7 @@
   hosts: all
   roles:
     - role: genlab.miniforge
+      release_version: 24.3.0-0
       usernames: 
         - alice
         - bob

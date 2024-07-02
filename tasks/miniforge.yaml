@@ -4,12 +4,12 @@
 - name: "Build miniforge basic facts ({{ loop_username }})"
   ansible.builtin.set_fact:
     miniforge_dir: "/home/{{ loop_username }}/miniforge3"
-    miniforge_version: "Miniforge3-{{ ansible_system }}-{{ ansible_architecture }}"
+    installation_script_name: "Miniforge3-{{ ansible_system }}-{{ ansible_architecture }}"
 
 
 - name: "Build miniforge path facts ({{ loop_username }})"
   ansible.builtin.set_fact:
-    miniforge_script_path: "/home/{{ loop_username }}/{{ miniforge_version }}.sh"
+    miniforge_script_path: "/home/{{ loop_username }}/{{ installation_script_name }}.sh"
     mamba_bin_path: "{{ miniforge_dir }}/bin/mamba"
 
 
@@ -18,7 +18,7 @@
     msg: "{{ miniforge_script_path }}"
 
 
-- name: "Ensure {{ loop_username }} exists"
+- name: "Ensure exists {{ loop_username }}"
   ansible.builtin.user:
     name: "{{ loop_username }}"
     state: present
@@ -34,14 +34,14 @@
     - name: "Check Mamba availability ({{ loop_username }})"
       changed_when: false
       ansible.builtin.command:
-        cmd: "{{ mamba_bin_path }} info"  
+        cmd: "{{ mamba_bin_path }} info"
 
   rescue:
     - name: "Download miniforge ({{ loop_username }})"
       vars:
         allow_world_readable_tmpfiles: true
       ansible.builtin.get_url:
-        url: "https://github.com/conda-forge/miniforge/releases/download/24.3.0-0/{{ miniforge_version }}.sh"
+        url: "https://github.com/conda-forge/miniforge/releases/download/{{ release_version }}/{{ installation_script_name }}.sh"
         dest: "{{ miniforge_script_path }}"
         mode: "0600"
 
