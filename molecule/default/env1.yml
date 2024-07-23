@@ -7,5 +7,4 @@ dependencies:
  - scikit-learn=0.21
  - pip=19.1
  - pip:
-   - kaggle==1.5
    - yellowbrick==0.9
