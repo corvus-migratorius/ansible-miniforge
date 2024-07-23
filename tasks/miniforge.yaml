@@ -85,3 +85,13 @@
         content: "{{ condarc | to_nice_yaml }}"
         mode: "0600"
       when: condarc_file is not defined or condarc_file == ""
+
+- name: "Deploy environments from files for {{ loop_username }}"
+  become: true
+  become_user: "{{ loop_username }}"
+  with_items: "{{ user_env_files[loop_username] }}"
+  loop_control:
+    loop_var: env_file
+  ansible.builtin.command:
+    cmd: >
+      {{ mamba_bin_path }} env create -f {{ env_file }}

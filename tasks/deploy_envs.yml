@@ -1,0 +1,21 @@
+---
+
+- name: "Build miniforge basic facts {{ loop_username }}"
+  ansible.builtin.set_fact:
+    miniforge_dir: "/home/{{ loop_username }}/miniforge3"
+    mamba_bin_path: "{{ miniforge_dir }}/bin/mamba"
+
+- name: "Display miniforge script version {{ loop_username }}"
+  ansible.builtin.debug:
+    msg: "{{ mamba_bin_path }}"
+
+- name: "Deploy environments from files for {{ loop_username }}"
+  become: true
+  become_user: "{{ loop_username }}"
+  with_items: "{{ user_env_files[loop_username] }}"
+  loop_control:
+    loop_var: env_file
+  ansible.builtin.command:
+    cmd: >
+      {{ mamba_bin_path }} env create -f {{ env_file }}
+ 

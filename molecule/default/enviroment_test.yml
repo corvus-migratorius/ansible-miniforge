@@ -6,3 +6,5 @@ dependencies:
    - pip>=22.2
    - shellcheck==0.9.0
    - terraform==1.6.5
+   - numpy
+   - bottle

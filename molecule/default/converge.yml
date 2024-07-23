@@ -7,6 +7,13 @@
       usernames: 
         - alice
         - bob
-      condarc:
-        channels: [ conda-forge ]
-        dependencies: [ python=3.10, pip>=22.2, shellcheck==0.9.0, terraform==1.6.5 ]
+      condarc_file: "enviroment_test.yml"
+        # channels: [ conda-forge ]
+        # dependencies: [ python=3.10, pip>=22.2, shellcheck==0.9.0, terraform==1.6.5 ]
+      user_env_files:
+        alice:
+          - "env1.yml"
+          - "env2.yml"
+        bob:
+          - "env1.yml"
+          - "env2.yml"
