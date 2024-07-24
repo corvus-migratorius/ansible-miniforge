@@ -38,8 +38,8 @@
 
   rescue:
     - name: "Download miniforge ({{ loop_username }})"
-      vars:
-        allow_world_readable_tmpfiles: true
+      # vars:
+      #   allow_world_readable_tmpfiles: true
       ansible.builtin.get_url:
         url: "https://github.com/conda-forge/miniforge/releases/download/{{ release_version }}/{{ installation_script_name }}.sh"
         dest: "{{ miniforge_script_path }}"
