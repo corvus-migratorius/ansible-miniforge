@@ -92,6 +92,7 @@
   with_items: "{{ user_env_files[loop_username] }}"
   loop_control:
     loop_var: env_file
+  changed_when: false
   ansible.builtin.command:
     cmd: >
       {{ mamba_bin_path }} env create -f {{ env_file }}
