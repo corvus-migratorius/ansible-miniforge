@@ -6,4 +6,4 @@ dependencies:
    - python~=3.10
    - pip>=22.2
    - pip:
-        - magic
+        - arrow

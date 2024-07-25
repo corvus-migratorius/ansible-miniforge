@@ -8,6 +8,7 @@
       usernames:
         - alice
         - bob
-      condarc_file: "environment_test.yml"
+      condarc:
+        channels: [ conda-forge ]
       manifest_dir: "manifests"
       user_mapping_file: "deployment.yml"
