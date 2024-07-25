@@ -27,9 +27,9 @@
 
 - name: "Install miniforge"
   become: true
+  become_user: "{{ loop_username }}"
   vars:
     allow_world_readable_tmpfiles: true
-  become_user: "{{ loop_username }}"
   block:
     - name: "Check Mamba availability ({{ loop_username }})"
       changed_when: false
@@ -38,8 +38,8 @@
 
   rescue:
     - name: "Download miniforge ({{ loop_username }})"
-      vars:
-        allow_world_readable_tmpfiles: true
+      # vars:
+      #   allow_world_readable_tmpfiles: true
       ansible.builtin.get_url:
         url: "https://github.com/conda-forge/miniforge/releases/download/{{ release_version }}/{{ installation_script_name }}.sh"
         dest: "{{ miniforge_script_path }}"
@@ -73,25 +73,26 @@
 
   rescue:
     - name: "Set default .condarc from external file if provided ({{ loop_username }})"
+      when: condarc_file is defined and condarc_file != ""
       ansible.builtin.copy:
         dest: "/home/{{ loop_username }}/.condarc"
         src: "{{ condarc_file }}"
         mode: "0600"
-      when: condarc_file is defined and condarc_file != ""
 
     - name: "Set default content via .condarc ({{ loop_username }})"
+      when: condarc_file is not defined or condarc_file == ""
       ansible.builtin.copy:
         dest: "/home/{{ loop_username }}/.condarc"
         content: "{{ condarc | to_nice_yaml }}"
         mode: "0600"
-      when: condarc_file is not defined or condarc_file == ""
 
-- name: "Deploy environments from files for {{ loop_username }}"
-  become: true
-  become_user: "{{ loop_username }}"
-  with_items: "{{ user_env_files[loop_username] }}"
-  loop_control:
-    loop_var: env_file
-  ansible.builtin.command:
-    cmd: >
-      {{ mamba_bin_path }} env create -f {{ env_file }}
+# - name: "Deploy environments from files for {{ loop_username }}"
+#   become: true
+#   become_user: "{{ loop_username }}"
+#   with_items: "{{ user_env_files[loop_username] }}"
+#   loop_control:
+#     loop_var: env_file
+#   changed_when: false
+#   ansible.builtin.command:
+#     cmd: >
+#       {{ mamba_bin_path }} env create -f {{ env_file }}

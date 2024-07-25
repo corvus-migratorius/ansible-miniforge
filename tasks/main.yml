@@ -12,5 +12,3 @@
 #   loop_control:
 #     loop_var: loop_username
 #   ansible.builtin.include_tasks: "deploy_envs.yml"
-
-        
