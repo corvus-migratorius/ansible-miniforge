@@ -1,0 +1,9 @@
+---
+name: project-alpha
+channels:
+   - conda-forge
+dependencies:
+   - python~=3.12
+   - pip>=22.2
+   - pip:
+        - humanfriendly

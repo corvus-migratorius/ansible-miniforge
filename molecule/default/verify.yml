@@ -1,8 +1,32 @@
 ---
-- name: Converge
+- name: Verify
   hosts: all
-  roles:
-    - role: genlab.miniforge
-      usernames:
-        - alice
-        - bob
+  gather_facts: false
+  any_errors_fatal: true
+  vars:
+    user_mapping_file: "deployment.yml"
+
+  tasks:
+    - name: "Read deployment mapping"
+      ansible.builtin.include_vars:
+        name: user_mapping
+        file: "{{ user_mapping_file }}"
+
+    - name: "Check the deployed environments for Alice"
+      become: true
+      become_user: alice
+      loop:
+        - { env: 'project-alpha', module: 'humanfriendly' }
+        - { env: 'project-beta', module: 'arrow' }
+      changed_when: false
+      ansible.builtin.command:
+        cmd: ~/miniforge3/envs/{{ item.env }}/bin/python -c 'import {{ item.module }}'
+
+    - name: "Check the deployed environments for Bob"
+      become: true
+      become_user: bob
+      loop:
+        - { env: 'project-beta', module: 'arrow' }
+      changed_when: false
+      ansible.builtin.command:
+        cmd: ~/miniforge3/envs/{{ item.env }}/bin/python -c 'import {{ item.module }}'

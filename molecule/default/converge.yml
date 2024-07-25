@@ -2,30 +2,13 @@
 - name: Converge
   hosts: all
 
-  pre_tasks:
-    - name: Copy env1.yml file content
-      ansible.builtin.copy:
-        dest: "/home/"
-        src: "env1.yml"
-        mode: '777'
-
-    - name: Copy env2.yml file content
-      ansible.builtin.copy:
-        dest: "/home/"
-        src: "env2.yml"
-        mode: '777'
-
   roles:
     - role: genlab.miniforge
       release_version: 24.3.0-0
       usernames:
         - alice
         - bob
-      condarc_file: "environment_test.yml"
-        # channels: [ conda-forge ]
-        # dependencies: [ python=3.10, pip>=22.2, shellcheck==0.9.0, terraform==1.6.5 ]
-      user_env_files:
-        alice:
-          - "/home/env1.yml"
-        bob:
-          - "/home/env2.yml"
+      condarc:
+        channels: [ conda-forge ]
+      manifest_dir: "manifests"
+      user_mapping_file: "deployment.yml"
