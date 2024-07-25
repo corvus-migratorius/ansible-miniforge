@@ -8,7 +8,7 @@
   ansible.builtin.include_tasks: "miniforge.yaml"
 
 - name: "Deploy Mamba environment manifests"
-  when: user_mapping_file is defined
+  when: user_mapping_file is defined and user_mapping_file != ""
   block:
 
     - name: "Read deployment mapping"
