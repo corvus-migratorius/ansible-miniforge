@@ -1,0 +1,12 @@
+---
+- name: "Deploy manifest files for user: {{ loop_username }}"
+  when: "user_mapping[loop_username] is defined"
+  loop: "{{ user_mapping[loop_username] }}"
+  become: true
+  become_user: "{{ loop_username }}"
+  ansible.builtin.copy:
+    src: "{{ manifest_dir }}/{{ item }}"
+    dest: "/home/{{ loop_username }}/{{ item }}"
+    owner: "{{ loop_username }}"
+    group: "{{ loop_username }}"
+    mode: "0660"

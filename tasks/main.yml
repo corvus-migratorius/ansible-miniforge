@@ -7,8 +7,17 @@
     loop_var: loop_username
   ansible.builtin.include_tasks: "miniforge.yaml"
 
-# - name: "Deploy environments from files for each user"
-#   loop: "{{ usernames }}"
-#   loop_control:
-#     loop_var: loop_username
-#   ansible.builtin.include_tasks: "deploy_envs.yml"
+- name: "Deploy Mamba environment manifests"
+  when: user_mapping_file is defined
+  block:
+
+    - name: "Read deployment mapping"
+      ansible.builtin.include_vars:
+        name: user_mapping
+        file: "{{ user_mapping_file }}"
+
+    - name: "Deploy manifests according to the provided user-mapping"
+      loop: "{{ usernames }}"
+      loop_control:
+        loop_var: loop_username
+      ansible.builtin.include_tasks: "manifests.yml"
