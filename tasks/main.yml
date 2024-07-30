@@ -1,4 +1,23 @@
 ---
-- name: "Mock task"
-  ansible.builtin.debug:
-    msg: "hello, world!"
+# tasks file for playbooks/roles/miniforge
+
+- name: "Deploy Mamba in a user loop"
+  loop: "{{ usernames }}"
+  loop_control:
+    loop_var: loop_username
+  ansible.builtin.include_tasks: "miniforge.yaml"
+
+- name: "Deploy Mamba environment manifests"
+  when: user_mapping_file is defined and user_mapping_file != ""
+  block:
+
+    - name: "Read deployment mapping"
+      ansible.builtin.include_vars:
+        name: user_mapping
+        file: "{{ user_mapping_file }}"
+
+    - name: "Deploy manifests according to the provided user-mapping"
+      loop: "{{ usernames }}"
+      loop_control:
+        loop_var: loop_username
+      ansible.builtin.include_tasks: "manifests.yml"

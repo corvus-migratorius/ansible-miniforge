@@ -1,0 +1,2 @@
+alice: [project-alpha.yml, project-beta.yml]
+bob: [project-beta.yml]

@@ -1,5 +1,22 @@
 ---
 - name: Converge
   hosts: all
+  vars:
+    usernames_test: [alice, bob]
+
+  pre_tasks:
+    - name: "Create test users"
+      loop: "{{ usernames_test }}"
+      ansible.builtin.user:
+        name: "{{ item }}"
+        state: present
+        create_home: true
+
   roles:
-    - role: genlab.template
+    - role: genlab.miniforge
+      release_version: 24.3.0-0
+      usernames: "{{ usernames_test }}"
+      condarc:
+        channels: [ conda-forge ]
+      manifest_dir: "manifests"
+      user_mapping_file: "deployment.yml"
