@@ -24,7 +24,9 @@
     mode: "0660"
 
 - name: "Create environments from deployed manifests for user: {{ loop_username }}"
-  when: "user_mapping[loop_username] is defined"
+  when:
+    - "user_mapping[loop_username] is defined"
+    - "create_envs is true"
   loop: "{{ user_mapping[loop_username] }}"
   become: true
   become_user: "{{ loop_username }}"
