@@ -1,2 +1,5 @@
 ---
 release_version: 24.3.0-0
+installation_script_name: "Miniforge3-{{ ansible_system }}-{{ ansible_architecture }}"
+miniforge_script_path: "/tmp/{{ installation_script_name }}.sh"
+miniforge_release_base_url: "https://github.com/conda-forge/miniforge/releases/download/{{ release_version }}"

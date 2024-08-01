@@ -1,17 +1,26 @@
 ---
-- name: "Build miniforge basic facts ({{ loop_username }})"
-  ansible.builtin.set_fact:
-    miniforge_dir: "/home/{{ loop_username }}/miniforge3"
-    installation_script_name: "Miniforge3-{{ ansible_system }}-{{ ansible_architecture }}"
+# These variables are registered as host vars, for whatever deep reason
+- name: "Get current user entity info"
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ loop_username }}"
+    split: ":"
 
 
-- name: "Build miniforge path facts ({{ loop_username }})"
+- name: "Get current user home directory ({{ loop_username }}"
   ansible.builtin.set_fact:
-    miniforge_script_path: "/home/{{ loop_username }}/{{ installation_script_name }}.sh"
+    homedir: "{{ getent_passwd[loop_username][4] }}"
+
+- name: "Set miniforge dir ({{ loop_username }}"
+  ansible.builtin.set_fact:
+    miniforge_dir: "{{ homedir }}/miniforge3"
+
+- name: "Build miniforge bin path ({{ loop_username }})"
+  ansible.builtin.set_fact:
     mamba_bin_path: "{{ miniforge_dir }}/bin/mamba"
 
 
-- name: "Display miniforge script version ({{ loop_username }})"
+- name: "Display miniforge script path ({{ loop_username }})"
   ansible.builtin.debug:
     msg: "{{ miniforge_script_path }}"
 
@@ -28,18 +37,10 @@
         cmd: "{{ mamba_bin_path }} info"
 
   rescue:
-    - name: "Download miniforge ({{ loop_username }})"
-      # vars:
-      #   allow_world_readable_tmpfiles: true
-      ansible.builtin.get_url:
-        url: "https://github.com/conda-forge/miniforge/releases/download/{{ release_version }}/{{ installation_script_name }}.sh"
-        dest: "{{ miniforge_script_path }}"
-        mode: "0600"
-
     - name: "Install miniforge in a non-interactive mode ({{ loop_username }})"
       ansible.builtin.command:
         cmd: "/bin/bash {{ miniforge_script_path }} -b"
-        creates: "/home/{{ loop_username }}/miniforge3"
+        creates: "{{ homedir }}/miniforge3"
 
     - name: "Initialize Mamba/Conda ({{ loop_username }})"
       changed_when: false
@@ -60,19 +61,19 @@
       register: this
       failed_when: this.stat.exists is false
       ansible.builtin.stat:
-        path: "/home/{{ loop_username }}/.condarc"
+        path: "{{ homedir }}/.condarc"
 
   rescue:
     - name: "Set default .condarc from external file if provided ({{ loop_username }})"
       when: condarc_file is defined and condarc_file != ""
       ansible.builtin.copy:
-        dest: "/home/{{ loop_username }}/.condarc"
         src: "{{ condarc_file }}"
+        dest: "{{ homedir }}/.condarc"
         mode: "0600"
 
     - name: "Set default content via .condarc ({{ loop_username }})"
       when: condarc_file is not defined or condarc_file == ""
       ansible.builtin.copy:
-        dest: "/home/{{ loop_username }}/.condarc"
+        dest: "{{ homedir }}/.condarc"
         content: "{{ condarc | to_nice_yaml }}"
         mode: "0600"

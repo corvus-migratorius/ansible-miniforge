@@ -1,5 +1,13 @@
 ---
 # tasks file for playbooks/roles/miniforge
+- name: "Download miniforge from '{{ miniforge_release_base_url }}'"
+  retries: 3
+  delay: 1
+  ansible.builtin.get_url:
+    url: "{{ miniforge_release_base_url }}/{{ installation_script_name }}.sh"
+    timeout: 10
+    dest: "{{ miniforge_script_path }}"
+    mode: "0664"
 
 - name: "Deploy Mamba in a user loop"
   loop: "{{ usernames }}"
