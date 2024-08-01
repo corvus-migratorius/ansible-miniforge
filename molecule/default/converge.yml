@@ -16,6 +16,7 @@
     - role: genlab.miniforge
       release_version: 24.3.0-0
       usernames: "{{ usernames_test }}"
+      create_envs: true
       condarc:
         channels: [ conda-forge ]
       manifest_dir: "manifests"

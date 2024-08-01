@@ -1,4 +1,16 @@
 ---
+# These variables are registered as host vars, for whatever deep reason
+
+- name: "Get current user entity info"
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ loop_username }}"
+    split: ":"
+
+- name: "Get current user home directory"
+  ansible.builtin.set_fact:
+    homedir: "{{ getent_passwd[loop_username][4] }}"
+
 - name: "Deploy manifest files for user: {{ loop_username }}"
   when: "user_mapping[loop_username] is defined"
   loop: "{{ user_mapping[loop_username] }}"
@@ -6,17 +18,19 @@
   become_user: "{{ loop_username }}"
   ansible.builtin.copy:
     src: "{{ manifest_dir }}/{{ item }}"
-    dest: "/home/{{ loop_username }}/{{ item }}"
+    dest: "{{ homedir }}/{{ item }}"
     owner: "{{ loop_username }}"
     group: "{{ loop_username }}"
     mode: "0660"
 
 - name: "Create environments from deployed manifests for user: {{ loop_username }}"
-  when: "user_mapping[loop_username] is defined"
+  when:
+    - "user_mapping[loop_username] is defined"
+    - "create_envs is true"
   loop: "{{ user_mapping[loop_username] }}"
   become: true
   become_user: "{{ loop_username }}"
   ansible.builtin.shell:
-    cmd: "~/miniforge3/bin/mamba env create -f ~/{{ item }}"
+    cmd: "{{ homedir }}/miniforge3/bin/mamba env create -f {{ homedir }}/{{ item }}"
     executable: /bin/bash
-    creates: "/home/{{ loop_username }}/miniforge3/envs/{{ item | split('.') | first }}"
+    creates: "{{ homedir }}/miniforge3/envs/{{ item | split('.') | first }}"
