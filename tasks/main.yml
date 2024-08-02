@@ -1,5 +1,4 @@
 ---
-# tasks file for playbooks/roles/miniforge
 - name: "Download miniforge from '{{ miniforge_release_base_url }}'"
   retries: 3
   delay: 1
@@ -10,22 +9,7 @@
     mode: "0664"
 
 - name: "Deploy Mamba in a user loop"
-  loop: "{{ usernames }}"
+  loop: "{{ users }}"
   loop_control:
-    loop_var: loop_username
+    loop_var: user
   ansible.builtin.include_tasks: "miniforge.yaml"
-
-- name: "Deploy Mamba environment manifests"
-  when: user_mapping_file is defined and user_mapping_file != ""
-  block:
-
-    - name: "Read deployment mapping"
-      ansible.builtin.include_vars:
-        name: user_mapping
-        file: "{{ user_mapping_file }}"
-
-    - name: "Deploy manifests according to the provided user-mapping"
-      loop: "{{ usernames }}"
-      loop_control:
-        loop_var: loop_username
-      ansible.builtin.include_tasks: "manifests.yml"

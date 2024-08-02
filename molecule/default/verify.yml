@@ -3,15 +3,8 @@
   hosts: all
   gather_facts: false
   any_errors_fatal: true
-  vars:
-    user_mapping_file: "deployment.yml"
 
   tasks:
-    - name: "Read deployment mapping"
-      ansible.builtin.include_vars:
-        name: user_mapping
-        file: "{{ user_mapping_file }}"
-
     - name: "Check Mamba installing correct tools from channels"
       become: true
       become_user: alice
@@ -46,3 +39,12 @@
       changed_when: false
       ansible.builtin.command:
         cmd: ~/miniforge3/envs/{{ item.env }}/bin/python -c 'import {{ item.module }}'
+
+    - name: "Check that no environments were deployed for Charlie"
+      become: true
+      become_user: charlie
+      register: charlie_envs
+      failed_when: charlie_envs.stdout_lines | length > 0
+      changed_when: false
+      ansible.builtin.command:
+        cmd: "ls ~/miniforge3/envs"
