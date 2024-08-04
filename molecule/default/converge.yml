@@ -1,12 +1,18 @@
 ---
+# you can use {{all_users | selectattr('name', 'in', mamba_users)}} to narrow down a larger list
 - name: Converge
   hosts: all
   vars:
-    usernames_test: [alice, bob]
+    mamba_users:
+      - name: alice
+        mamba_envs: [ project-alpha.yml, project-beta.yml ]
+      - name: bob
+        mamba_envs: [ project-beta.yml ]
+      - name: charlie
 
   pre_tasks:
     - name: "Create test users"
-      loop: "{{ usernames_test }}"
+      loop: [ alice, bob, charlie ]
       ansible.builtin.user:
         name: "{{ item }}"
         state: present
@@ -15,9 +21,8 @@
   roles:
     - role: genlab.miniforge
       release_version: 24.3.0-0
-      usernames: "{{ usernames_test }}"
+      users: "{{ mamba_users }}"
+      manifest_dir: "manifests"
       create_envs: true
       condarc:
         channels: [ conda-forge ]
-      manifest_dir: "manifests"
-      user_mapping_file: "deployment.yml"
