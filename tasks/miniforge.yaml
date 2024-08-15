@@ -75,7 +75,9 @@
         mode: "0600"
 
 - name: "Deploy manifest files for user: {{ user.name }}"
-  when: "user.mamba_envs is defined"
+  when:
+    - "manifest_dir is defined"
+    - "user.mamba_envs is defined"
   loop: "{{ user.mamba_envs }}"
   become: true
   become_user: "{{ user.name }}"
