@@ -6,9 +6,9 @@
     mamba_users:
       - name: alice
         mamba_envs: [ project-alpha.yml, project-beta.yml ]
-      - name: bob
-        mamba_envs: [ project-beta.yml ]
-      - name: charlie
+      # - name: bob
+      #   mamba_envs: [ project-beta.yml ]
+      # - name: charlie
 
   pre_tasks:
     - name: "Create test users"

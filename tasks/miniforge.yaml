@@ -74,6 +74,10 @@
         content: "{{ condarc | to_nice_yaml }}"
         mode: "0600"
 
+- name: "Debug msg"
+  ansible.builtin.debug:
+    msg: "debuuuug"
+
 - name: "Deploy manifest files for user: {{ user.name }}"
   when:
     - "manifest_dir is defined"
@@ -95,7 +99,23 @@
   loop: "{{ user.mamba_envs }}"
   become: true
   become_user: "{{ user.name }}"
-  ansible.builtin.shell:
-    cmd: "{{ homedir }}/miniforge3/bin/mamba env create -f {{ homedir }}/{{ item }}"
-    executable: /bin/bash
-    creates: "{{ homedir }}/miniforge3/envs/{{ item | split('.') | first }}"
+  block: 
+    - name: "Get content of manifest file"
+      ansible.builtin.slurp:
+        src: "{{ homedir }}/{{ item }}"
+      register: manifest_content
+
+    - name: "Extract enviroment name from manifest file"
+      ansible.builtin.set_fact:
+        env_name: '{{ (manifest_content.content | b64decode | from_yaml).name }}'
+
+    - name: "Check if environment already exists"
+      ansible.builtin.stat:
+        path: "{{ homedir }}/miniforge3/envs/{{ env_name }}"
+      register: env_check
+
+    - name: "Create environment {{ env_name }} from {{ item }}"
+      ansible.builtin.shell:
+        cmd: "{{ homedir }}/miniforge3/bin/mamba env create -f {{ homedir }}/{{ item }}"
+        executable: /bin/bash
+      when: not env_check.stat.exists

@@ -1,5 +1,5 @@
 ---
-name: project-beta
+name: cucubeta
 channels:
    - conda-forge
 dependencies:
