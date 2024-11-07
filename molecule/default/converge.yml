@@ -7,6 +7,9 @@
       - name: alice
         mamba_files: [ project-alpha.yml, project-beta.yml ]
       - name: bob
+        mamba_files: [ project-alpha.yml, project-beta.yml ]
+      - name: charlie
+
 
   pre_tasks:
     - name: "Create test users"
