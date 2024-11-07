@@ -6,11 +6,11 @@
     key: "{{ user.name }}"
     split: ":"
 
-- name: "Get current user home directory ({{ user.name }}"
+- name: "Get current user home directory ({{ user.name }})"
   ansible.builtin.set_fact:
     homedir: "{{ getent_passwd[user.name][4] }}"
 
-- name: "Set miniforge dir ({{ user.name }}"
+- name: "Set miniforge dir ({{ user.name }})"
   ansible.builtin.set_fact:
     miniforge_dir: "{{ homedir }}/miniforge3"
 
@@ -74,11 +74,12 @@
         content: "{{ condarc | to_nice_yaml }}"
         mode: "0600"
 
+
 - name: "Deploy manifest files for user: {{ user.name }}"
   when:
     - "manifest_dir is defined"
-    - "user.mamba_envs is defined"
-  loop: "{{ user.mamba_envs }}"
+    - "user.mamba_files is defined"
+  loop: "{{ user.mamba_files }}"
   become: true
   become_user: "{{ user.name }}"
   ansible.builtin.copy:
@@ -88,14 +89,13 @@
     group: "{{ user.name }}"
     mode: "0660"
 
+
+# Variables from the outer scope (like 'user') will get passed down to the included tasks
 - name: "Create environments from deployed manifests for user: {{ user.name }}"
   when:
-    - "user.mamba_envs is defined"
     - "create_envs is true"
-  loop: "{{ user.mamba_envs }}"
-  become: true
-  become_user: "{{ user.name }}"
-  ansible.builtin.shell:
-    cmd: "{{ homedir }}/miniforge3/bin/mamba env create -f {{ homedir }}/{{ item }}"
-    executable: /bin/bash
-    creates: "{{ homedir }}/miniforge3/envs/{{ item | split('.') | first }}"
+    - "user.mamba_files is defined"
+  loop: "{{ user.mamba_files }}"
+  loop_control:
+    loop_var: file
+  ansible.builtin.include_tasks: "manifests.yml"

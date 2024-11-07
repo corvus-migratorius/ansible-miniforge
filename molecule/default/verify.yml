@@ -10,7 +10,7 @@
       become_user: alice
       changed_when: false
       vars:
-        env: project-alpha
+        env: env_alpha
       register: tool_version
       ansible.builtin.command:
         cmd: ~/miniforge3/envs/{{ env }}/bin/stress-ng --version
@@ -25,8 +25,8 @@
       become: true
       become_user: alice
       loop:
-        - { env: 'project-alpha', module: 'humanfriendly' }
-        - { env: 'project-beta', module: 'arrow' }
+        - { env: 'env_alpha', module: 'humanfriendly' }
+        - { env: 'cucubeta', module: 'arrow' }
       changed_when: false
       ansible.builtin.command:
         cmd: ~/miniforge3/envs/{{ item.env }}/bin/python -c 'import {{ item.module }}'
@@ -35,7 +35,7 @@
       become: true
       become_user: bob
       loop:
-        - { env: 'project-beta', module: 'arrow' }
+        - { env: 'cucubeta', module: 'arrow' }
       changed_when: false
       ansible.builtin.command:
         cmd: ~/miniforge3/envs/{{ item.env }}/bin/python -c 'import {{ item.module }}'

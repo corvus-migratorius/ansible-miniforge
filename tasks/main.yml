@@ -3,7 +3,7 @@
   retries: 3
   delay: 1
   ansible.builtin.get_url:
-    url: "{{ miniforge_release_base_url }}/{{ installation_script_name }}.sh"
+    url: "{{ miniforge_release_base_url }}/{{ release_version }}/{{ installation_script_name }}.sh"
     timeout: 10
     dest: "{{ miniforge_script_path }}"
     mode: "0664"
@@ -12,4 +12,4 @@
   loop: "{{ users }}"
   loop_control:
     loop_var: user
-  ansible.builtin.include_tasks: "miniforge.yaml"
+  ansible.builtin.include_tasks: "miniforge.yml"

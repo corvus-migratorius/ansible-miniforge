@@ -4,7 +4,7 @@ galaxy_info:
   namespace: genlab
   author: Alexander Gorelyshev
   company: Genlab, LLC
-  description: Deploy miniforge distribution of the Mamba package manager
+  description: Deploy the Miniforge distribution of the Mamba package manager
   license: MIT
   min_ansible_version: "2.1"
 
