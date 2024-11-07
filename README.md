@@ -1,7 +1,7 @@
 Role Name
 =========
 
-A brief description of the role goes here.
+Install the Miniforge distribution for each supplied user and, optionally, deploy Mamba environment from provided YAML files.
 
 Requirements
 ------------
@@ -11,8 +11,16 @@ None
 Role Variables
 --------------
 
-`usernames`: a list of username strings 
-`condarc.channels`: a list of Conda channel strings
+`release_version`: Miniforge release version
+`miniforge_script_path`: where to download the installation script
+`miniforge_release_base_url`: base URL
+`create_envs`: whethere to create environments for each user or not
+
+`users`: a list of dictionaries representing user accounts that need Miniforge
+`manifest_dir`: path to folder on the Ansible controller host where environment files are kept
+`condarc`: a dictionary that will be YAMLified into the condarc file
+
+NOTE: `users` items must have `name` string attribute and, optionally, a `mamba_files` list attribute (filenames must be available under the `manifest_dir`).
 
 Dependencies
 ------------
@@ -22,23 +30,7 @@ None
 Example Playbook
 ----------------
 
-```yaml
-role:
-  - role: miniforge
-    usernames:
-      - alice
-      - bob
-    condarc:
-      channels: [ conda-forge ]
-      dependencies: [ python=3.10, pip>=22.2, shellcheck==0.9.0, terraform==1.6.5 ]
-```
-----------------
-
-```yaml
-condarc_file: environment.yaml
-```
-
-As an alternative to the list of channels and dependencies, an environment file can be provided.
+See `molecule` > `default` > `converge.yml`
 
 ----------------
 
@@ -51,3 +43,4 @@ Author Information
 ------------------
 
 corvus-migratorius@proton.me
+masayganova@gmail.com
