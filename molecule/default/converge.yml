@@ -5,10 +5,8 @@
   vars:
     mamba_users:
       - name: alice
-        mamba_envs: [ project-alpha.yml, project-beta.yml ]
-      # - name: bob
-      #   mamba_envs: [ project-beta.yml ]
-      # - name: charlie
+        mamba_files: [ project-alpha.yml, project-beta.yml ]
+      - name: bob
 
   pre_tasks:
     - name: "Create test users"

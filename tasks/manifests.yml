@@ -1,0 +1,43 @@
+---
+- name: "Get current user entity info"
+  become: true
+  become_user: "{{ item.0.name }}"
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ item.0.name }}"
+    split: ":"
+
+- name: "Get current user home directory"
+  become: true
+  become_user: "{{ item.0.name }}"
+  ansible.builtin.set_fact:
+    homedir: "{{ getent_passwd[item.0.name][4] }}"
+
+- name: "Get content of manifest file"
+  register: manifest_content
+  ansible.builtin.slurp:
+    src: "{{ homedir }}/{{ item.1 }}"
+
+# Since the file can be named whatever, we need to extract the environment name
+# as that is what the actual environment folder name will be
+- name: "Extract enviroment name from manifest file"
+  ansible.builtin.set_fact:
+    env_name: '{{ (manifest_content.content | b64decode | from_yaml).name }}'
+
+- name: "Display the extracted environment name"
+  ansible.builtin.debug:
+    msg: "{{ env_name }}"
+
+# - name: "Check if environment already exists"
+#   register: env_check
+#   ansible.builtin.stat:
+#     path: "{{ item.0.homedir }}/miniforge3/envs/{{ env_name }}"
+
+- name: "Create environment: {{ env_name }}"
+  # when: not env_check.stat.exists
+  become: true
+  become_user: "{{ item.0.name }}"
+  ansible.builtin.shell:
+    cmd: "{{ homedir }}/miniforge3/bin/mamba env create -f {{ homedir }}/{{ item.1 }}"
+    executable: /bin/bash
+    creates: "{{ homedir }}/miniforge3/envs/{{ env_name }}"

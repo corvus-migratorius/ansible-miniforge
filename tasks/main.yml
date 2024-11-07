@@ -12,4 +12,13 @@
   loop: "{{ users }}"
   loop_control:
     loop_var: user
-  ansible.builtin.include_tasks: "miniforge.yaml"
+  ansible.builtin.include_tasks: "miniforge.yml"
+
+- name: "Create environments from deployed manifests"
+  when:
+    - "create_envs is true"
+    - "item.1 is defined"
+  with_subelements:
+    - "{{ users | map('combine', {'mamba_files': []}, list_merge='append') }}"
+    - "mamba_files"
+  ansible.builtin.include_tasks: "manifests.yml"
