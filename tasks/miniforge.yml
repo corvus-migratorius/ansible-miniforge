@@ -90,6 +90,7 @@
     mode: "0660"
 
 
+# Variables from the outer scope (like 'user') will get passed down to the included tasks
 - name: "Create environments from deployed manifests for user: {{ user.name }}"
   when:
     - "create_envs is true"

@@ -1,5 +1,5 @@
 ---
-- name: "Get content of manifest file"
+- name: "Get contents of the manifest file"
   register: manifest_content
   ansible.builtin.slurp:
     src: "{{ homedir }}/{{ file }}"
@@ -15,10 +15,10 @@
     msg: "{{ env_name }}"
 
 - name: "Create environment: {{ env_name }}"
-  # when: not env_check.stat.exists
   become: true
   become_user: "{{ user.name }}"
   ansible.builtin.shell:
     cmd: "{{ homedir }}/miniforge3/bin/mamba env create -f {{ homedir }}/{{ file }}"
     executable: /bin/bash
+    # ensures that the task runs only when the environment doesn't exist
     creates: "{{ homedir }}/miniforge3/envs/{{ env_name }}"
